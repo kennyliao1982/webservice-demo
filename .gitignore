@@ -1,0 +1,5 @@
+/webservice-demo-common/target/
+/webservice-demo-jaxws/target/
+/webservice-demo-jaxrs/target/
+/webservice-demo-client/target/
+.DS_Store

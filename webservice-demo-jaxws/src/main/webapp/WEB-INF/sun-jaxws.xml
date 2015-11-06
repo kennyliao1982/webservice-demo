@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints version="2.0" xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime">
+  <endpoint implementation="com.stylehood.jaxws.demo.CustomerService" name="CustomerService" url-pattern="/customerService"/>
+  <endpoint implementation="com.stylehood.jaxws.demo.CustomerServiceImpl" name="CustomerServiceImplService" url-pattern="/CustomerServiceImplService"/>
+</endpoints>
