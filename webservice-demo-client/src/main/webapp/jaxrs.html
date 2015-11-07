@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="css/bootstrap.min.css" >
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css" >
+        <script src="js/jquery-1.11.3.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+
+        <style>
+            body {
+                position: relative;
+            }
+            .affix {
+                top: 20px;
+            }
+
+            @media screen and (max-width: 810px) {
+                #section1, #section2, #section3, #section41, #section42  {
+                    margin-left: 150px;
+                }
+            }
+        </style>        
+
+        <script>
+            var auth;
+            $(document).ready(function () {
+                $('#getTokenBtn').click(function () {
+                    $('#result_getToken').find('div').eq(0).empty();
+                    $('#result_getToken').hide();
+                    $.ajax({
+                        url: '../webservice-demo-jaxrs/rest/login',
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (res) {
+                            auth = res.data.auth;
+                            $('#result_getToken').find('div').eq(0).html(res.data.auth);
+                            $('#result_getToken').show();
+                        }
+                    });
+                });
+
+                $('#createCustomerBtn').click(function () {
+                    $('#result_createCustomer').find('div').eq(0).empty();
+                    $('#result_createCustomer').hide();
+
+                    $.ajax({
+                        url: '../webservice-demo-jaxrs/rest/customer',
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (res) {
+                            $('#result_createCustomer').find('div').eq(0).html(JSON.stringify(res));
+                            $('#result_createCustomer').show();
+                        },
+                        contentType:"application/json; charset=utf-8",
+                        data: encodeBase64({
+                            'name': $('#name').val(),
+                            'city': $('#city').val(),
+                            'phone': $('#phone').val(),
+                            'email': $('#email').val()
+                        }), beforeSend: function (req)
+                        {
+                            req.setRequestHeader("auth", auth);
+                        }
+                    });
+                });
+
+                $('#getCustomerBtn').click(function () {
+                    $('#result_getCustomer').find('div').eq(0).empty();
+                    $('#result_getCustomer').hide();
+
+                    $.ajax({
+                        url: '../webservice-demo-jaxrs/rest/customer/' + $('#customerId').val(),
+                        type: 'get',
+                        dataType: 'json',
+                        success: function (res) {
+                            $('#result_getCustomer').find('div').eq(0).html(JSON.stringify(res));
+                            $('#result_getCustomer').show();
+                        },
+                        beforeSend: function (req)
+                        {
+                            req.setRequestHeader("auth", auth);
+                        }
+                    });
+                });
+
+                $('#updateCustomerBtn').click(function () {
+                    $('#result_updateCustomer').find('div').eq(0).empty();
+                    $('#result_updateCustomer').hide();
+
+                    $.ajax({
+                        url: '../webservice-demo-jaxrs/rest/customer/' +  $('#customerId2').val(),
+                        type: 'put',
+                        dataType: 'json',
+                        success: function (res) {
+                            $('#result_updateCustomer').find('div').eq(0).html(JSON.stringify(res));
+                            $('#result_updateCustomer').show();
+                        },
+                        contentType:"application/json; charset=utf-8",
+                        data: encodeBase64({
+                            'email': $('#email2').val()
+                        }), beforeSend: function (req)
+                        {
+                            req.setRequestHeader("auth", auth);
+                        }
+                    });
+
+                });
+            });
+
+            function encodeBase64(obj){
+                var objString = JSON.stringify(obj);
+                return btoa(objString);
+            }
+
+        </script>
+
+    </head>
+    <body data-spy="scroll" data-target="#myScrollspy">
+        <div class="container-fluid" style="height:50px;">
+            <h1>JAXRS DEMO</h1>    
+        </div>
+        <br>
+        <div class="container">
+            <div class="row">
+                <nav class="col-sm-3" id="myScrollspy">
+                    <ul class="nav nav-pills nav-stacked" data-spy="affix" data-offset-top="55">
+                        <li><a href="#session_getAuthToken">get auth token</a></li>
+                        <li><a href="#session_createCustomer">create customer</a></li>
+                        <li><a href="#session_getCustomer">get customer</a></li>
+                        <li><a href="#session_updateCustomer">update customer</a></li>
+
+                    </ul>
+                </nav>
+                <div class="col-sm-9">
+                    <div id="session_getAuthToken" class="panel panel-primary">
+                        <div class="panel-heading">get auth token</div>
+                        <div class="panel-body">
+                            <form id="getTokenForm">                           
+                                <div class="form-group text-center">
+                                    <button id="getTokenBtn" type="button"
+                                            class="btn btn-default btn-sm">登入</button>                                  	
+                                </div>
+                            </form>
+
+                            <div id="result_getToken" style="display:none">
+                                <h5>token:</h5>
+                                <div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="session_createCustomer" class="panel panel-primary">
+                        <div class="panel-heading">create customer</div>
+                        <div class="panel-body">
+                            <form id="createCustomerForm">
+                                <div class="form-group">
+                                    <label for="name">name</label> 
+                                    <input type="text" name="name" 
+                                           id="name" class="form-control input-sm"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="city">city</label> 
+                                    <input type="text" name="city" 
+                                           id="city" class="form-control input-sm"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">phone</label> 
+                                    <input type="text" name="phone" 
+                                           id="phone" class="form-control input-sm"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">email</label> 
+                                    <input type="text" name="email" 
+                                           id="email" class="form-control input-sm"/>
+                                </div>
+                                <div class="form-group text-center">
+                                    <button id="createCustomerBtn" type="button"
+                                            class="btn btn-default btn-sm">儲存</button>
+                                    <button type="reset"
+                                            class="btn btn-default btn-sm">清空</button>		
+                                </div>
+                            </form>
+
+                            <div id="result_createCustomer" style="display:none">
+                                <h5>customer:</h5>
+                                <div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="session_getCustomer" class="panel panel-primary">
+                        <div class="panel-heading">get customer</div>
+                        <div class="panel-body">
+                            <form id="getCustomerForm">
+                                <div class="form-group">
+                                    <label for="customerId">customer id</label> 
+                                    <input type="text" name="customerId" 
+                                           id="customerId" class="form-control input-sm"/>
+                                </div>
+
+                                <div class="form-group text-center">
+                                    <button id="getCustomerBtn" type="button"
+                                            class="btn btn-default btn-sm">查詢</button>
+                                    <button type="reset"
+                                            class="btn btn-default btn-sm">清空</button>		
+                                </div>
+                            </form>
+
+                            <div id="result_getCustomer" style="display:none">
+                                <h5>customer:</h5>
+                                <div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="session_updateCustomer" class="panel panel-primary">
+                        <div class="panel-heading">update customer</div>
+                        <div class="panel-body">
+                            <form id="updateCustomerForm">
+                                <div class="form-group">
+                                    <label for="customerId">customer id</label> 
+                                    <input type="text" name="customerId" 
+                                           id="customerId2" class="form-control input-sm"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">email</label> 
+                                    <input type="text" name="email" 
+                                           id="email2" class="form-control input-sm"/>
+                                </div>
+
+                                <div class="form-group text-center">
+                                    <button id="updateCustomerBtn" type="button"
+                                            class="btn btn-default btn-sm">更新</button>
+                                    <button type="reset"
+                                            class="btn btn-default btn-sm">清空</button>		
+                                </div>
+                            </form>
+
+                            <div id="result_updateCustomer" style="display:none">
+                                <h5>customer:</h5>
+                                <div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>

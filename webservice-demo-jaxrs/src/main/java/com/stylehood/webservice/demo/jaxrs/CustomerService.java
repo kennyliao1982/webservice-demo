@@ -1,7 +1,10 @@
 package com.stylehood.webservice.demo.jaxrs;
 
+import com.stylehood.webservice.demo.dao.CustomerDao;
+import com.stylehood.webservice.demo.dao.PurchaseOrderDao;
 import com.stylehood.webservice.demo.model.Customer;
-import java.util.Date;
+import com.stylehood.webservice.demo.model.PurchaseOrder;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -16,33 +19,64 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class CustomerService {
 
+    private final CustomerDao customerDao = new CustomerDao();
+    private final PurchaseOrderDao purchaseOrderDao = new PurchaseOrderDao();
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
-    public void createCustomer(Customer customer){
-        System.out.println(new Date() + customer.getName());
+    public JsonResponse<Customer> createCustomer(Customer customer) {
+        JsonResponse<Customer> res = new JsonResponse<>();
+        try {
+            Customer newCustomer = customerDao.createCustomer(customer);
+            res.setData(newCustomer);
+        } catch (Exception e) {
+            res.setSuccess(false);
+            res.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return res;
     }
 
     @GET
     @Path("/{id}")
-    public Customer getCustomer(@PathParam("id") int id) {
-        Customer customer = new Customer();
-        customer.setId(1);
-        customer.setName("kenny");
-        System.out.println(new Date());
-        return customer;
+    public JsonResponse<Customer> getCustomer(@PathParam("id") int customerId) {
+        JsonResponse<Customer> res = new JsonResponse<>();
+        try {
+            Customer customer = customerDao.queryById(customerId);
+            List<PurchaseOrder> orders = purchaseOrderDao.queryByCustomerId(customerId);
+            if (customer != null) {
+                customer.setOrders(orders);
+            }
+            res.setData(customer);
+        } catch (Exception e) {
+            res.setSuccess(false);
+            res.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return res;
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public void updateCustomer(@PathParam("id") int id, Customer customer){
-        System.out.println(id + "_" + new Date() + customer.getName());
+    public JsonResponse<Customer> updateCustomer(@PathParam("id") int customerId, Customer customer) {
+        JsonResponse<Customer> res = new JsonResponse<>();
+        try {
+            customerDao.updateEmail(customerId, customer.getEmail());
+            Customer updatedCustomer = customerDao.queryById(customerId);
+            res.setData(updatedCustomer);
+        } catch (Exception e) {
+            res.setSuccess(false);
+            res.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return res;
     }
-    
+
     @DELETE
     @Path("/{id}")
-    public void deleteCustomer(@PathParam("id") int id){
+    public void deleteCustomer(@PathParam("id") int id) {
         System.out.println(id);
     }
 }
